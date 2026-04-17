@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deepbook Multi-Wallet Checker</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #121212;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+        margin: 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      .container {
+        background-color: #1e1e24;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 800px;
+      }
+      h2 {
+        margin-top: 0;
+        color: #3bc9db;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      textarea {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #444;
+        background-color: #2b2b36;
+        color: #fff;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 13px;
+        resize: vertical;
+        outline: none;
+      }
+      textarea:focus {
+        border-color: #3bc9db;
+      }
+      button {
+        width: 100%;
+        padding: 15px;
+        background-color: #3bc9db;
+        color: #121212;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+      }
+      button:hover {
+        background-color: #22b8cf;
+      }
+
+      /* Table Styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        background-color: #2b2b36;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #3a3a45;
+      }
+      th {
+        background-color: #3bc9db;
+        color: #121212;
+        font-weight: bold;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover {
+        background-color: #3a3a45;
+      }
+
+      /* Trạng thái */
+      .loading {
+        color: #fcc419;
+      }
+      .error {
+        color: #ff6b6b;
+      }
+      .success {
+        color: #51cf66;
+        font-weight: bold;
+      }
+      .not-found {
+        color: #adb5bd;
+      }
+
+      /* Tổng điểm */
+      .summary-box {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: rgba(59, 201, 219, 0.1);
+        border: 1px dashed #3bc9db;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 18px;
+      }
+      .total-points {
+        color: #51cf66;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .short-addr {
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Deepbook Multi-Wallet Checker</h2>
+      <textarea
+        id="walletInput"
+        rows="6"
+        placeholder="Dán các địa chỉ ví vào đây...&#10;Hỗ trợ ngăn cách bằng: Dấu phẩy, Dấu cách, Phím Tab, hoặc Xuống dòng."
+      ></textarea>
+      <button onclick="processWallets()">🚀 Kiểm tra Hàng Loạt</button>
+
+      <div id="resultArea" style="display: none">
+        <table>
+          <thead>
+            <tr>
+              <th width="10%">STT</th>
+              <th width="60%">Địa chỉ Ví</th>
+              <th width="30%">Điểm (Points)</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+
+        <div class="summary-box">
+          Tổng điểm của <span id="validCount">0</span> ví: <br />
+          <span class="total-points" id="totalPoints">0</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function shortenAddress(addr) {
+        if (addr.length < 15) return addr;
+        return addr.slice(0, 6) + "..." + addr.slice(-4);
+      }
+
+      async function processWallets() {
+        const inputStr = document.getElementById("walletInput").value;
+        const resultArea = document.getElementById("resultArea");
+        const tableBody = document.getElementById("tableBody");
+        const totalPointsEl = document.getElementById("totalPoints");
+        const validCountEl = document.getElementById("validCount");
+
+        // BÍ QUYẾT Ở ĐÂY: Dùng \s (đại diện cho mọi loại khoảng trắng, tab, enter) và dấu phẩy
+        let addresses = inputStr
+          .split(/[\s,]+/)
+          .map((a) => a.trim())
+          .filter((a) => a !== "");
+
+        // Lọc ví trùng lặp để không tốn thời gian check 1 ví 2 lần
+        addresses = [...new Set(addresses)];
+
+        if (addresses.length === 0) {
+          alert("Vui lòng nhập ít nhất 1 địa chỉ ví!");
+          return;
+        }
+
+        // Làm sạch bảng trước khi chạy
+        tableBody.innerHTML = "";
+        resultArea.style.display = "block";
+        totalPointsEl.innerText = "0";
+        validCountEl.innerText = addresses.length;
+
+        let totalSum = 0;
+
+        // Render giao diện "Đang tải"
+        addresses.forEach((addr, index) => {
+          const tr = document.createElement("tr");
+          tr.id = `row-${index}`;
+          tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td class="short-addr" title="${addr}">${shortenAddress(addr)}</td>
+                <td id="status-${index}" class="loading">⏳ Đang tải...</td>
+            `;
+          tableBody.appendChild(tr);
+        });
+
+        const fetchPointForAddress = async (addr, index) => {
+          const statusTd = document.getElementById(`status-${index}`);
+          try {
+            const res = await fetch(
+              `https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${addr}`,
+            );
+            if (!res.ok) throw new Error("Lỗi server");
+
+            const data = await res.json();
+
+            if (data && data.length > 0 && data[0].total_points !== undefined) {
+              const points = data[0].total_points;
+              totalSum += points;
+              statusTd.className = "success";
+              statusTd.innerText = points.toLocaleString("en-US");
+
+              totalPointsEl.innerText = totalSum.toLocaleString("en-US");
+            } else {
+              statusTd.className = "not-found";
+              statusTd.innerText = "0 (Chưa có điểm)";
+            }
+          } catch (err) {
+            statusTd.className = "error";
+            statusTd.innerText = "Lỗi kết nối";
+          }
+        };
+
+        // Chạy đa luồng song song
+        await Promise.all(
+          addresses.map((addr, index) => fetchPointForAddress(addr, index)),
+        );
+      }
+    </script>
+  </body>
+</html>
