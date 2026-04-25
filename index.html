@@ -28,54 +28,73 @@
         
         .header-meta {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 10px;
+            justify-content: flex-end;
+            margin-bottom: 8px;
         }
         .price-status { font-size: 12px; color: #adb5bd; font-style: italic; }
         
-        .input-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        .input-group { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .input-group label { font-size: 13px; color: #adb5bd; margin-bottom: 5px; }
+        .input-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .input-group { flex: 1; display: flex; flex-direction: column; }
+        .input-group label { font-size: 13px; color: #adb5bd; margin-bottom: 8px; font-weight: 500; }
         
+        /* Input container để chứa nút refresh đẹp hơn */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
         input, textarea {
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444;
+            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #444;
             background-color: #2b2b36; color: #fff; box-sizing: border-box;
-            font-family: monospace; font-size: 14px; outline: none;
+            font-family: 'Roboto Mono', monospace; font-size: 15px; outline: none;
+            transition: border-color 0.2s;
         }
         input:focus, textarea:focus { border-color: #3bc9db; }
         
-        /* Nút refresh nhỏ bên trong ô input giá */
-        .refresh-btn-inline {
-            position: absolute;
-            right: 8px;
-            bottom: 6px;
-            background: #3a3a45;
-            border: none;
+        /* Nút Refresh kiểu mới: To hơn, rõ hơn, có hiệu ứng hover */
+        .refresh-btn-new {
+            margin-left: 10px;
+            padding: 0 18px;
+            height: 47px; /* Khớp với chiều cao input */
+            background-color: #343a40;
             color: #3bc9db;
-            padding: 4px 8px;
-            border-radius: 4px;
+            border: 1px solid #495057;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
             transition: all 0.2s;
         }
-        .refresh-btn-inline:hover { background: #4dabf7; color: #fff; }
-        .refresh-btn-inline:disabled { opacity: 0.5; cursor: not-allowed; }
+        .refresh-btn-new:hover {
+            background-color: #3bc9db;
+            color: #121212;
+            border-color: #3bc9db;
+        }
+        .refresh-btn-new:active { transform: scale(0.95); }
+        .refresh-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .spin { animation: rotate 0.8s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         textarea { resize: vertical; margin-bottom: 15px; }
         
         .btn-main {
-            width: 100%; padding: 15px; background-color: #3bc9db; color: #121212;
-            border: none; border-radius: 8px; font-weight: bold; font-size: 16px;
-            cursor: pointer; transition: all 0.2s; margin-bottom: 20px;
+            width: 100%; padding: 16px; background-color: #3bc9db; color: #121212;
+            border: none; border-radius: 10px; font-weight: bold; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 25px;
         }
-        .btn-main:hover { background-color: #22b8cf; }
+        .btn-main:hover { background-color: #22b8cf; box-shadow: 0 0 15px rgba(59, 201, 219, 0.3); }
         
         table {
             width: 100%; border-collapse: collapse; margin-top: 10px;
-            background-color: #2b2b36; border-radius: 8px; overflow: hidden; font-size: 14px;
+            background-color: #2b2b36; border-radius: 10px; overflow: hidden; font-size: 14px;
         }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a45; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #3a3a45; }
         th { background-color: #3bc9db; color: #121212; font-weight: bold; }
         .loading { color: #fcc419; }
         .success { color: #51cf66; font-weight: bold; }
@@ -83,16 +102,15 @@
         .usd-col { color: #ff922b; font-weight: bold; }
         
         .summary-box {
-            margin-top: 20px; padding: 20px; background-color: rgba(59, 201, 219, 0.05);
-            border: 1px dashed #3bc9db; border-radius: 8px; display: flex;
+            margin-top: 25px; padding: 25px; background-color: rgba(59, 201, 219, 0.05);
+            border: 1px dashed #3bc9db; border-radius: 12px; display: flex;
             justify-content: space-around; text-align: center;
         }
-        .sum-item p { margin: 0 0 5px 0; color: #adb5bd; font-size: 14px; }
-        .sum-item h3 { margin: 0; font-size: 22px; color: #fff; }
+        .sum-item p { margin: 0 0 8px 0; color: #adb5bd; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sum-item h3 { margin: 0; font-size: 24px; color: #fff; }
         .sum-points { color: #51cf66 !important; }
         .sum-tokens { color: #fcc419 !important; }
         .sum-usd { color: #ff922b !important; }
-        .short-addr { font-family: monospace; }
     </style>
 </head>
 <body>
@@ -101,22 +119,26 @@
     <h2>Deepbook Airdrop Calculator</h2>
     
     <div class="header-meta">
-        <span></span> <div class="price-status" id="priceTimer">Đang lấy giá...</div>
+        <div class="price-status" id="priceTimer">Đang lấy giá...</div>
     </div>
 
     <div class="input-row">
-        <div class="input-group">
-            <label>Tỷ lệ quy đổi (1 Point = x Token)</label>
+        <div class="input-group" style="flex: 0.8;">
+            <label>Tỷ lệ (1 Point = x Token)</label>
             <input type="number" id="rateInput" step="any" value="1" oninput="refreshCalculations()">
         </div>
         <div class="input-group">
             <label>Giá $DEEP (DexScreener)</label>
-            <input type="number" id="priceInput" step="any" placeholder="0.000000" oninput="refreshCalculations()">
-            <button class="refresh-btn-inline" id="manualRefreshBtn" onclick="updateTokenPrice(true)">🔄 Làm mới</button>
+            <div class="input-wrapper">
+                <input type="number" id="priceInput" step="any" placeholder="0.000000" oninput="refreshCalculations()">
+                <button class="refresh-btn-new" id="manualRefreshBtn" onclick="updateTokenPrice(true)">
+                    <span id="refreshIcon">🔄</span> Làm mới
+                </button>
+            </div>
         </div>
     </div>
 
-    <textarea id="walletInput" rows="5" placeholder="Dán danh sách ví (ngăn cách bằng dấu phẩy hoặc xuống dòng)..."></textarea>
+    <textarea id="walletInput" rows="5" placeholder="Dán danh sách ví (xuống dòng hoặc dấu phẩy)..."></textarea>
     <button class="btn-main" onclick="processWallets()">🚀 Kiểm tra & Tính toán</button>
     
     <div id="resultArea" style="display: none;">
@@ -162,15 +184,15 @@
         return addr.length > 15 ? addr.slice(0, 6) + '...' + addr.slice(-4) : addr;
     }
 
-    // --- Cập nhật giá từ DexScreener ---
     async function updateTokenPrice(isManual = false) {
         const priceInput = document.getElementById('priceInput');
         const priceTimer = document.getElementById('priceTimer');
         const refreshBtn = document.getElementById('manualRefreshBtn');
+        const refreshIcon = document.getElementById('refreshIcon');
         
         if (isManual) {
-            refreshBtn.innerText = "⌛...";
             refreshBtn.disabled = true;
+            refreshIcon.classList.add('spin');
         }
 
         try {
@@ -180,10 +202,14 @@
             
             if (data.pairs && data.pairs.length > 0) {
                 const bestPair = data.pairs.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
-                const price = parseFloat(bestPair.priceUsd);
                 
-                priceInput.value = price.toFixed(6);
-                priceTimer.innerText = `Giá $DEEP: $${price} (${isManual ? 'Vừa cập nhật' : 'Tự động lúc ' + new Date().toLocaleTimeString()})`;
+                // Lấy giá thô (raw price) để đảm bảo tính nhất quán
+                const rawPrice = bestPair.priceUsd;
+                const formattedPrice = parseFloat(rawPrice).toFixed(6);
+                
+                // FIX LỖI: Cả 2 nơi cùng dùng chung một biến formattedPrice
+                priceInput.value = formattedPrice; 
+                priceTimer.innerText = `Giá $DEEP: $${formattedPrice} (${isManual ? 'Vừa cập nhật' : 'Tự động lúc ' + new Date().toLocaleTimeString()})`;
                 
                 if (walletPointsData.length > 0) refreshCalculations();
             }
@@ -193,9 +219,9 @@
         } finally {
             if (isManual) {
                 setTimeout(() => {
-                    refreshBtn.innerText = "🔄 Làm mới";
                     refreshBtn.disabled = false;
-                }, 500); // Trì hoãn nhẹ để tạo cảm giác phản hồi
+                    refreshIcon.classList.remove('spin');
+                }, 600);
             }
         }
     }
@@ -249,7 +275,7 @@
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td class="short-addr" title="${addr}">${shortenAddress(addr)}</td>
-                <td id="pts-${index}" class="loading">⏳ Đang lấy dữ liệu...</td>
+                <td id="pts-${index}" class="loading">⏳ Loading...</td>
                 <td id="tok-${index}" class="token-col">-</td>
                 <td id="usd-${index}" class="usd-col">-</td>
             `;
@@ -272,16 +298,13 @@
                 });
                 document.getElementById('validCount').innerText = addresses.length;
                 refreshCalculations();
-            } catch (err) {
-                console.error("DeepBook Error:", err);
-            }
+            } catch (err) { console.error(err); }
         }
     }
 
-    // Logic khởi chạy
     window.onload = () => {
-        updateTokenPrice(); // Chạy ngay khi refresh trang
-        setInterval(updateTokenPrice, 60000); // Tự động lặp lại mỗi 1 phút
+        updateTokenPrice();
+        setInterval(updateTokenPrice, 60000);
     };
 </script>
 
