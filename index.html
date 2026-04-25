@@ -3,123 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepbook Airdrop Simulator Pro</title>
+    <title>Deepbook Airdrop Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #3bc9db; --bg: #121212; --card: #1e1e24; --input: #2b2b36; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: #fff; display: flex; justify-content: center; padding: 40px 20px; margin: 0; min-height: 100vh; box-sizing: border-box; }
-        .container { background-color: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); width: 100%; max-width: 1000px; }
-        h2 { margin-top: 0; color: var(--primary); text-align: center; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .price-status { font-size: 12px; color: #adb5bd; text-align: right; margin-bottom: 10px; font-style: italic; }
-        
-        .input-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
-        .input-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-        .input-group label { font-size: 12px; color: #adb5bd; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
-        
-        .input-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background-color: var(--input); color: #fff; box-sizing: border-box; font-family: 'Roboto Mono', monospace; font-size: 14px; outline: none; }
-        input:focus, select:focus { border-color: var(--primary); }
-        input:read-only { background-color: #1a1a21; color: #777; cursor: not-allowed; }
+        :root {
+            --primary: #3bc9db;
+            --bg: #0b0e11;
+            --card-bg: #161a1e;
+            --input-bg: #1e2329;
+            --border: #2b3139;
+            --text-main: #eaecef;
+            --text-dim: #929aa5;
+            --success: #02c076;
+            --warning: #f0b90b;
+        }
 
-        /* Style cho nút phụ */
-        .sub-btn { padding: 0 10px; height: 43px; background: #343a40; color: #adb5bd; border: 1px solid #495057; border-radius: 10px; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .sub-btn.active { color: var(--primary); border-color: var(--primary); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-        .refresh-btn { padding: 0 12px; height: 43px; background: #343a40; color: var(--primary); border: 1px solid #495057; border-radius: 10px; cursor: pointer; }
-        .spin { animation: rotate 0.8s linear infinite; }
+        .dashboard {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Input Styles --- */
+        .field-group { margin-bottom: 18px; }
+        .field-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .input-control {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .input-control:focus-within { border-color: var(--primary); background: #222930; }
+
+        input, select, textarea {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input::placeholder { color: #474d57; }
+
+        /* --- Stats Badge --- */
+        .highlight-box {
+            background: rgba(59, 201, 219, 0.05);
+            border: 1px solid rgba(59, 201, 219, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .highlight-val { font-size: 20px; font-weight: 700; color: var(--primary); }
+
+        /* --- Buttons --- */
+        .btn-icon {
+            background: #2b3139;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            transition: 0.2s;
+        }
+        .btn-icon:hover { color: var(--primary); background: #363c45; }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* --- Result Area --- */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; }
+        .stat-value { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono'; }
+
+        .spin { animation: rotate 1s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .calc-info { margin-bottom: 20px; padding: 12px; background: rgba(59, 201, 219, 0.08); border: 1px solid rgba(59, 201, 219, 0.2); border-radius: 10px; color: var(--primary); font-size: 14px; text-align: center; }
-
-        .btn-main { width: 100%; padding: 16px; background-color: var(--primary); color: #121212; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 201, 219, 0.3); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: var(--input); border-radius: 10px; overflow: hidden; font-size: 13px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a45; }
-        th { background-color: var(--primary); color: #121212; }
-        
-        .summary-box { margin-top: 25px; padding: 25px; background: #1a1a21; border: 1px solid var(--primary); border-radius: 16px; display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 20px; }
-        .sum-item p { margin: 0 0 5px 0; color: #adb5bd; font-size: 11px; }
-        .sum-item h3 { margin: 0; font-size: 24px; font-family: 'Roboto Mono', monospace; }
-        .color-pts { color: #51cf66; } .color-tok { color: #fcc419; } .color-usd { color: #ff922b; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+        th { text-align: left; padding: 12px; color: var(--text-dim); font-weight: 500; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono'; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Deepbook Airdrop Simulator</h2>
-    
-    <div class="price-status" id="priceTimer">Đang kết nối DexScreener...</div>
-
-    <div class="input-row">
-        <div class="input-group" style="flex: 0.6;">
-            <label>Gợi ý % Supply</label>
-            <select id="percentSelect" onchange="applyQuickPercent()">
-                <option value="">-- Chọn mốc --</option>
-                <option value="0.1">0.1% Supply</option>
-                <option value="0.5">0.5% Supply</option>
-                <option value="1.0" selected>1.0% Supply</option>
-                <option value="2.0">2.0% Supply</option>
-                <option value="3.0">3.0% Supply</option>
-            </select>
-        </div>
-
-        <div class="input-group" style="flex: 0.6;">
-            <label>% Supply (10B)</label>
-            <input type="number" id="supplyPercent" value="1.0" step="0.1" oninput="calculateFromSupply()">
-        </div>
-        
-        <div class="input-group">
-            <label>Tổng Point (Mặc định 12M)</label>
-            <div class="input-wrapper">
-                <input type="number" id="systemTotalPoints" value="12000000" readonly oninput="calculateFromSupply()">
-                <button class="sub-btn" id="unlockBtn" onclick="toggleUnlock()">🔓</button>
+<div class="dashboard">
+    <div class="main-content">
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="section-title">✨ Airdrop Simulator</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="field-group">
+                    <label class="field-label">Dán danh sách ví</label>
+                    <div class="input-control">
+                        <textarea id="walletInput" rows="5" placeholder="0x...&#10;0x..."></textarea>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Hoặc nhập số Point cá nhân</label>
+                    <div class="input-control" style="height: 115px;">
+                        <input type="number" id="manualSinglePoints" placeholder="Ví dụ: 10,000" oninput="handleManualInput()">
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="input-group">
-            <label>$DEEP / Point</label>
-            <input type="number" id="deepPerPoint" step="any" oninput="calculateFromRate()">
-        </div>
+            <button class="btn-primary" onclick="processWallets()">🚀 CHẠY TÍNH TOÁN</button>
 
-        <div class="input-group">
-            <label>Giá $DEEP (USD)</label>
-            <div class="input-wrapper">
-                <input type="number" id="priceInput" step="any" oninput="refreshCalculations()">
-                <button class="refresh-btn" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
+            <div id="resultArea" style="display:none;">
+                <div class="summary-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Tổng Points</div>
+                        <div class="stat-value" id="totalPoints">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tổng $DEEP</div>
+                        <div class="stat-value" id="totalTokens" style="color: var(--warning);">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card">
+                        <div class="stat-label">Giá trị (USD)</div>
+                        <div class="stat-value" id="totalUsd" style="color: var(--success);">$0.00</div>
+                    </div>
+                </div>
+                <table id="walletTable">
+                    <thead><tr><th>Ví</th><th>Points</th><th>$DEEP</th><th>USD</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <div id="rateDisplay" class="calc-info">Vui lòng nhập thông số để tính toán</div>
+    <div class="sidebar">
+        <div class="card">
+            <div class="section-title">⚙️ Project Params</div>
+            
+            <div class="highlight-box">
+                <div class="stat-label">Tỷ lệ quy đổi hiện tại</div>
+                <div class="highlight-val" id="rateDisplay">1 Pt = 0.00 DEEP</div>
+            </div>
 
-    <hr style="border: 0; border-top: 1px solid #333; margin: 25px 0;">
+            <div class="field-group">
+                <label class="field-label">Gợi ý % Supply</label>
+                <div class="input-control">
+                    <select id="percentSelect" onchange="applyQuickPercent()">
+                        <option value="0.1">0.1% Supply</option>
+                        <option value="0.5">0.5% Supply</option>
+                        <option value="1.0">1.0% Supply</option>
+                        <option value="2.0" selected>2.0% Supply</option>
+                        <option value="3.0">3.0% Supply</option>
+                    </select>
+                </div>
+            </div>
 
-    <div class="input-row">
-        <div class="input-group">
-            <label>Dán danh sách ví</label>
-            <textarea id="walletInput" rows="3" placeholder="Địa chỉ ví..."></textarea>
-        </div>
-        <div class="input-group" style="flex: 0.5;">
-            <label>Hoặc: Nhập số Point</label>
-            <input type="number" id="manualSinglePoints" placeholder="Ví dụ: 5000" oninput="handleManualInput()">
-        </div>
-    </div>
+            <div class="field-group">
+                <label class="field-label">% Supply Airdrop</label>
+                <div class="input-control">
+                    <input type="number" id="supplyPercent" value="2.0" step="0.1" oninput="calculateFromSupply()">
+                </div>
+            </div>
 
-    <button class="btn-main" onclick="processWallets()">🚀 CHẠY TÍNH TOÁN</button>
-    
-    <div id="resultArea" style="display: none; margin-top: 20px;">
-        <table id="walletTable">
-            <thead>
-                <tr><th>#</th><th>Ví</th><th>Points</th><th>$DEEP</th><th>Giá trị ($)</th></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+            <div class="field-group">
+                <label class="field-label">Tổng Point Hệ thống</label>
+                <div class="input-control">
+                    <input type="number" id="systemTotalPoints" value="12000000" readonly oninput="calculateFromSupply()">
+                    <button class="btn-icon" onclick="toggleUnlock()" id="unlockBtn">🔓</button>
+                </div>
+            </div>
 
-        <div class="summary-box">
-            <div class="sum-item"><p>Tổng Points</p><h3 id="totalPoints" class="color-pts">0</h3></div>
-            <div class="sum-item"><p>Tổng $DEEP</p><h3 id="totalTokens" class="color-tok">0</h3></div>
-            <div class="sum-item"><p>Tổng USD</p><h3 id="totalUsd" class="color-usd">$0.00</h3></div>
+            <div class="field-group">
+                <label class="field-label">Deep Per Point</label>
+                <div class="input-control">
+                    <input type="number" id="deepPerPoint" step="any" oninput="calculateFromRate()">
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Giá $DEEP (Market)</label>
+                <div class="input-control">
+                    <input type="number" id="priceInput" step="any" oninput="refreshCalculations()">
+                    <button class="btn-icon" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
+                </div>
+                <div id="priceTimer" style="font-size: 10px; color: var(--text-dim); margin-top: 5px; text-align: right;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -129,59 +262,37 @@
     const TOTAL_SUPPLY = 10000000000;
     let walletPointsData = [];
 
-    // --- LOGIC TÍNH TOÁN ---
-
-    // 1. Khi chọn từ danh sách gợi ý
     function applyQuickPercent() {
-        const select = document.getElementById('percentSelect');
-        if (select.value !== "") {
-            document.getElementById('supplyPercent').value = select.value;
-            calculateFromSupply();
-        }
+        const val = document.getElementById('percentSelect').value;
+        if(val) { document.getElementById('supplyPercent').value = val; calculateFromSupply(); }
     }
 
-    // 2. Khi thay đổi % Supply hoặc Tổng Point
     function calculateFromSupply() {
         const percent = parseFloat(document.getElementById('supplyPercent').value) || 0;
         const sysPoints = parseFloat(document.getElementById('systemTotalPoints').value) || 1;
-        
-        const totalAirdropTokens = (percent / 100) * TOTAL_SUPPLY;
-        const rate = totalAirdropTokens / sysPoints;
-        
+        const rate = (percent / 100 * TOTAL_SUPPLY) / sysPoints;
         document.getElementById('deepPerPoint').value = rate.toFixed(8);
-        updateDisplayInfo(totalAirdropTokens, rate);
+        updateRateDisplay(rate);
         refreshCalculations();
     }
 
-    // 3. Khi nhập trực tiếp ô $DEEP/Point
     function calculateFromRate() {
         const rate = parseFloat(document.getElementById('deepPerPoint').value) || 0;
         const sysPoints = parseFloat(document.getElementById('systemTotalPoints').value) || 1;
-        
-        const totalAirdropTokens = rate * sysPoints;
-        const percent = (totalAirdropTokens / TOTAL_SUPPLY) * 100;
-        
+        const percent = ((rate * sysPoints) / TOTAL_SUPPLY) * 100;
         document.getElementById('supplyPercent').value = percent.toFixed(2);
-        document.getElementById('percentSelect').value = ""; // Reset dropdown
-        
-        updateDisplayInfo(totalAirdropTokens, rate);
+        updateRateDisplay(rate);
         refreshCalculations();
     }
 
-    function updateDisplayInfo(totalTokens, rate) {
-        document.getElementById('rateDisplay').innerText = 
-            `Quỹ Airdrop: ${totalTokens.toLocaleString()} DEEP | Tỷ lệ: 1 Point = ${rate.toLocaleString(undefined, {maximumFractionDigits: 8})} DEEP`;
+    function updateRateDisplay(rate) {
+        document.getElementById('rateDisplay').innerText = `1 Pt = ${rate.toLocaleString(undefined, {maximumFractionDigits: 4})} DEEP`;
     }
-
-    // --- CÁC HÀM PHỤ TRỢ ---
 
     function toggleUnlock() {
         const input = document.getElementById('systemTotalPoints');
-        const btn = document.getElementById('unlockBtn');
         input.readOnly = !input.readOnly;
-        btn.innerText = input.readOnly ? "🔓" : "🔒";
-        btn.classList.toggle('active');
-        if (!input.readOnly) input.focus();
+        document.getElementById('unlockBtn').innerText = input.readOnly ? "🔓" : "🔒";
     }
 
     async function updateTokenPrice(isManual = false) {
@@ -193,7 +304,7 @@
             if (data.pairs?.[0]) {
                 const price = parseFloat(data.pairs[0].priceUsd);
                 document.getElementById('priceInput').value = price.toFixed(6);
-                document.getElementById('priceTimer').innerText = `Giá $DEEP: $${price.toFixed(6)} (Cập nhật: ${new Date().toLocaleTimeString()})`;
+                document.getElementById('priceTimer').innerText = `Updated: ${new Date().toLocaleTimeString()}`;
                 refreshCalculations();
             }
         } catch (e) { console.error(e); }
@@ -203,40 +314,31 @@
     function refreshCalculations() {
         const price = parseFloat(document.getElementById('priceInput').value) || 0;
         const rate = parseFloat(document.getElementById('deepPerPoint').value) || 0;
-        let sumPts = 0, sumTok = 0, sumUsd = 0;
-
+        let sPts = 0, sTok = 0, sUsd = 0;
         const tableBody = document.getElementById('tableBody');
-        const isTableVisible = document.getElementById('walletTable').style.display !== 'none';
-        if (isTableVisible) tableBody.innerHTML = '';
+        const isTable = document.getElementById('walletTable').style.display !== 'none';
+        if (isTable) tableBody.innerHTML = '';
 
-        walletPointsData.forEach((item, index) => {
-            const tokens = item.points * rate;
-            const usd = tokens * price;
-            sumPts += item.points; sumTok += tokens; sumUsd += usd;
-
-            if (isTableVisible) {
+        walletPointsData.forEach((item, idx) => {
+            const tok = item.points * rate;
+            const usd = tok * price;
+            sPts += item.points; sTok += tok; sUsd += usd;
+            if (isTable) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${index+1}</td>
-                    <td style="font-family:monospace">${item.address.length > 15 ? item.address.slice(0,6)+'...'+item.address.slice(-4) : item.address}</td>
-                    <td>${item.points.toLocaleString()}</td>
-                    <td class="color-tok">${tokens.toLocaleString(undefined, {maximumFractionDigits: 1})}</td>
-                    <td class="color-usd">$${usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                `;
+                tr.innerHTML = `<td>${item.address.slice(0,6)}...</td><td>${item.points.toLocaleString()}</td><td style="color:var(--warning)">${tok.toLocaleString(undefined,{maximumFractionDigits:1})}</td><td style="color:var(--success)">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</td>`;
                 tableBody.appendChild(tr);
             }
         });
-
-        document.getElementById('totalPoints').innerText = sumPts.toLocaleString();
-        document.getElementById('totalTokens').innerText = sumTok.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('totalUsd').innerText = '$' + sumUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('totalPoints').innerText = sPts.toLocaleString();
+        document.getElementById('totalTokens').innerText = sTok.toLocaleString(undefined,{maximumFractionDigits:0});
+        document.getElementById('totalUsd').innerText = '$' + sUsd.toLocaleString(undefined,{minimumFractionDigits:2});
     }
 
     function handleManualInput() {
         const val = document.getElementById('manualSinglePoints').value;
         if (val > 0) {
             document.getElementById('walletInput').value = '';
-            walletPointsData = [{ address: "Ví Simulator", points: parseFloat(val) }];
+            walletPointsData = [{ address: "Cá nhân", points: parseFloat(val) }];
             document.getElementById('resultArea').style.display = 'block';
             document.getElementById('walletTable').style.display = 'none';
             refreshCalculations();
@@ -245,15 +347,14 @@
 
     async function processWallets() {
         const input = document.getElementById('walletInput').value;
-        const manualVal = document.getElementById('manualSinglePoints').value;
-        if (!input && !manualVal) return alert("Vui lòng nhập ví hoặc point!");
-        if (manualVal) { handleManualInput(); return; }
+        if (!input && !document.getElementById('manualSinglePoints').value) return;
+        if (document.getElementById('manualSinglePoints').value) { handleManualInput(); return; }
 
         let addrs = [...new Set(input.split(/[\s,]+/).filter(a => a))];
         document.getElementById('walletTable').style.display = 'table';
         document.getElementById('resultArea').style.display = 'block';
         walletPointsData = addrs.map(a => ({ address: a, points: 0 }));
-        
+
         for (let i = 0; i < addrs.length; i += 20) {
             const chunk = addrs.slice(i, i + 20);
             try {
