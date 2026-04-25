@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airdrop Simulator | DeepBook</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #134aed;
@@ -24,12 +24,15 @@
             margin: 0;
             padding: 20px;
             min-height: 100vh;
-            line-height: 1.5;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Smooth geometric font for numbers */
+        .num-font {
+            font-family: 'Outfit', sans-serif;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.2px;
         }
 
         /* Top Bar */
@@ -45,18 +48,10 @@
         }
 
         .live-stat { display: flex; flex-direction: column; }
-        .stat-label { color: var(--text-dim); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        
-        /* Font số ở Header: dùng JetBrains Mono để rõ ràng */
-        .stat-value { 
-            color: var(--primary); 
-            font-family: 'JetBrains Mono', monospace; 
-            font-weight: 700; 
-            font-size: 18px;
-            font-variant-numeric: tabular-nums; 
-        }
+        .stat-label { color: var(--text-dim); font-size: 11px; text-transform: uppercase; font-weight: 600; }
+        .stat-value { color: var(--primary); font-weight: 700; font-size: 19px; }
 
-        /* Grid */
+        /* Grid Layout */
         .main-grid {
             display: grid;
             grid-template-columns: 320px 1fr 320px;
@@ -76,9 +71,6 @@
             font-weight: 700;
             margin-bottom: 20px;
             color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
             border-bottom: 2px solid var(--primary-soft);
             padding-bottom: 10px;
         }
@@ -95,30 +87,19 @@
             align-items: center;
             transition: all 0.2s ease;
         }
-        .input-box:focus-within { 
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-soft);
-        }
+        .input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
 
         input, select, textarea {
             background: transparent;
             border: none;
             color: var(--text-main);
             width: 100%;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
             outline: none;
         }
-
-        /* Tinh chỉnh font số cho các ô Input */
-        input[type="number"], .num-font { 
-            font-family: 'JetBrains Mono', monospace; 
-            font-weight: 500;
-            letter-spacing: -0.5px;
-        }
         input:read-only { color: var(--text-dim); cursor: not-allowed; }
-
-        textarea { resize: none; min-height: 120px; }
+        textarea { font-family: 'Inter', sans-serif; resize: none; min-height: 120px; font-size: 13px; }
 
         .btn-calc {
             width: 100%;
@@ -130,14 +111,10 @@
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .btn-calc:hover { opacity: 0.9; }
 
-        .btn-mini { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 4px; border-radius: 4px; }
-        .btn-mini:hover { background: var(--primary-soft); color: var(--primary); }
-
-        /* Results Display */
         .res-item {
             background: var(--bg);
             padding: 16px;
@@ -146,22 +123,12 @@
             border: 1px solid var(--border);
         }
         .res-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-        
-        /* Font số ở khu vực Tổng kết: Size lớn, nét đậm, không rung khi nhảy số */
-        .res-val { 
-            font-size: 22px; 
-            font-weight: 700; 
-            font-family: 'JetBrains Mono', monospace; 
-            color: var(--text-main);
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -1px;
-        }
+        .res-val { font-size: 24px; font-weight: 700; color: var(--text-main); }
 
-        /* Table */
         .table-container { margin-top: 20px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: var(--bg); text-align: left; padding: 12px; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); background: white; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        th { background: var(--bg); text-align: left; padding: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); background: white; font-weight: 500; }
 
         .spin { animation: rotate 1s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -173,21 +140,21 @@
     <div class="top-bar">
         <div class="live-stat">
             <span class="stat-label">$DEEP Price</span>
-            <span class="stat-value" id="topPrice">$0.000000</span>
+            <span class="stat-value num-font" id="topPrice">$0.000000</span>
         </div>
         <div class="live-stat" style="align-items: center;">
             <span class="stat-label">Conversion Rate</span>
-            <span class="stat-value" id="topRate">1 Pt = 0.00 DEEP</span>
+            <span class="stat-value num-font" id="topRate">1 Pt = 0.00 DEEP</span>
         </div>
         <div class="live-stat" style="align-items: flex-end;">
             <span class="stat-label">Indexer Status</span>
-            <span id="priceTime" style="font-size: 12px; font-weight: 500; color: var(--success);">Connected</span>
+            <span id="priceTime" style="font-size: 12px; font-weight: 600; color: var(--success);">Online</span>
         </div>
     </div>
 
     <div class="main-grid">
         <div class="card">
-            <div class="card-title">Project Settings</div>
+            <div class="card-title">Project Configuration</div>
             
             <div class="field">
                 <label class="label">Allocation Tier</label>
@@ -213,8 +180,11 @@
             <div class="field">
                 <label class="label">Total System Points</label>
                 <div class="input-box">
-                    <input type="number" id="systemTotalPoints" value="12000000" readonly oninput="syncDropdownAndCalc()">
-                    <button class="btn-mini" onclick="toggleUnlock()" id="unlockBtn">🔓</button>
+                    <input type="text" id="systemTotalPoints" value="12,000,000" readonly 
+                           onfocus="this.value=this.value.replace(/,/g,'')" 
+                           onblur="formatInput(this); syncDropdownAndCalc()" 
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    <button style="background:none; border:none; cursor:pointer;" onclick="toggleUnlock()" id="unlockBtn">🔓</button>
                 </div>
             </div>
 
@@ -226,10 +196,10 @@
             </div>
 
             <div class="field">
-                <label class="label">Price Source (USD)</label>
+                <label class="label">Market Price (USD)</label>
                 <div class="input-box">
                     <input type="number" id="priceInput" step="any" oninput="refreshCalculations()">
-                    <button class="btn-mini" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
+                    <button style="background:none; border:none; cursor:pointer;" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
                 </div>
             </div>
         </div>
@@ -237,23 +207,27 @@
         <div class="card">
             <div class="card-title">Simulator</div>
             <div class="field">
-                <label class="label">Sui Wallet Addresses</label>
+                <label class="label">Wallet Addresses</label>
                 <div class="input-box">
-                    <textarea id="walletInput" placeholder="Dán danh sách ví vào đây..." oninput="clearManualInput()"></textarea>
+                    <textarea id="walletInput" placeholder="Paste Sui addresses (one per line)..." oninput="document.getElementById('manualSinglePoints').value=''"></textarea>
                 </div>
             </div>
-            <div style="text-align: center; color: var(--text-dim); font-size: 11px; margin-bottom: 20px;">— HOẶC —</div>
+            <div style="text-align: center; color: var(--text-dim); font-size: 11px; margin-bottom: 20px;">— OR —</div>
             <div class="field">
-                <label class="label">Personal Points Score</label>
+                <label class="label">Individual Point Score</label>
                 <div class="input-box">
-                    <input type="number" id="manualSinglePoints" placeholder="Nhập số point của riêng bạn" oninput="clearWalletInput()">
+                    <input type="text" id="manualSinglePoints" placeholder="Enter points" 
+                           onfocus="this.value=this.value.replace(/,/g,'')" 
+                           onblur="formatInput(this)" 
+                           oninput="this.value=this.value.replace(/[^0-9]/g,''); document.getElementById('walletInput').value=''">
                 </div>
             </div>
-            <button class="btn-calc" onclick="processWallets()">Run Analysis</button>
+            <button class="btn-calc" onclick="processWallets()">Calculate Rewards</button>
+            
             <div class="table-container" id="tableContainer" style="display:none;">
-                <table id="walletTable">
-                    <thead><tr><th>Wallet</th><th>Points</th><th>$DEEP</th><th>Value</th></tr></thead>
-                    <tbody id="tableBody"></tbody>
+                <table>
+                    <thead><tr><th>Wallet</th><th>Points</th><th>$DEEP</th><th>USD Value</th></tr></thead>
+                    <tbody id="tableBody" class="num-font"></tbody>
                 </table>
             </div>
         </div>
@@ -261,25 +235,39 @@
         <div class="card">
             <div class="card-title">Summary</div>
             <div class="res-item">
-                <div class="res-label">Total Points</div>
-                <div class="res-val" id="resPoints">0</div>
+                <div class="res-label">Total Points Accumulation</div>
+                <div class="res-val num-font" id="resPoints">0</div>
             </div>
             <div class="res-item">
-                <div class="res-label">Estimated $DEEP</div>
-                <div class="res-val" id="resTokens" style="color: var(--primary);">0</div>
+                <div class="res-label">Estimated $DEEP Reward</div>
+                <div class="res-val num-font" id="resTokens" style="color: var(--primary);">0</div>
             </div>
             <div class="res-item">
-                <div class="res-label">Market Value (USD)</div>
-                <div class="res-val" id="resUsd" style="color: var(--success);">$0.00</div>
+                <div class="res-label">Estimated Total Value</div>
+                <div class="res-val num-font" id="resUsd" style="color: var(--success);">$0.00</div>
             </div>
+            <p style="font-size: 11px; color: var(--text-dim); margin-top: 20px; line-height: 1.4;">
+                Disclaimer: Estimates are based on a fixed 10B supply. Real results may vary based on protocol parameters.
+            </p>
         </div>
     </div>
 </div>
 
 <script>
-    const DEEP_TOKEN_ADDR = '0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP';
     const TOTAL_SUPPLY = 10000000000;
     let walletPointsData = [];
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function formatInput(el) {
+        if(el.value !== "") el.value = formatNumber(el.value.replace(/,/g, ''));
+    }
+
+    function getRawValue(id) {
+        return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
+    }
 
     function syncDropdownAndCalc() {
         const currentVal = document.getElementById('supplyPercent').value;
@@ -306,28 +294,19 @@
 
     function calculateFromSupply() {
         const percent = parseFloat(document.getElementById('supplyPercent').value) || 0;
-        const sysPoints = parseFloat(document.getElementById('systemTotalPoints').value) || 1;
+        const sysPoints = getRawValue('systemTotalPoints') || 1;
         const rate = (percent / 100 * TOTAL_SUPPLY) / sysPoints;
         document.getElementById('deepPerPoint').value = rate.toFixed(8);
-        updateRateDisplay(rate);
+        document.getElementById('topRate').innerText = `1 Pt = ${rate.toLocaleString(undefined, {maximumFractionDigits: 4})} DEEP`;
         refreshCalculations();
     }
 
     function calculateFromRate() {
         const rate = parseFloat(document.getElementById('deepPerPoint').value) || 0;
-        const sysPoints = parseFloat(document.getElementById('systemTotalPoints').value) || 1;
+        const sysPoints = getRawValue('systemTotalPoints') || 1;
         const percent = ((rate * sysPoints) / TOTAL_SUPPLY) * 100;
         document.getElementById('supplyPercent').value = percent.toFixed(2);
-        syncDropdownAndCalc(); 
-        updateRateDisplay(rate);
-        refreshCalculations();
-    }
-
-    function clearManualInput() { document.getElementById('manualSinglePoints').value = ""; }
-    function clearWalletInput() { document.getElementById('walletInput').value = ""; }
-
-    function updateRateDisplay(rate) {
-        document.getElementById('topRate').innerText = `1 Pt = ${rate.toLocaleString(undefined, {maximumFractionDigits: 4})} DEEP`;
+        syncDropdownAndCalc();
     }
 
     function toggleUnlock() {
@@ -340,7 +319,7 @@
         const icon = document.getElementById('refIcon');
         if (isManual) icon.classList.add('spin');
         try {
-            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(DEEP_TOKEN_ADDR)}`);
+            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP`);
             const data = await res.json();
             if (data.pairs?.[0]) {
                 const price = parseFloat(data.pairs[0].priceUsd);
@@ -366,20 +345,20 @@
             sPts += item.points; sTok += tok; sUsd += usd;
             if (isTable) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${item.address.slice(0,6)}...${item.address.slice(-4)}</td><td>${item.points.toLocaleString()}</td><td style="color:var(--primary); font-weight:600">${tok.toLocaleString(undefined,{maximumFractionDigits:1})}</td><td style="color:var(--success); font-weight:600">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</td>`;
+                tr.innerHTML = `<td>${item.address.slice(0,6)}...${item.address.slice(-4)}</td><td>${formatNumber(item.points)}</td><td style="color:var(--primary); font-weight:700">${tok.toLocaleString(undefined,{maximumFractionDigits:1})}</td><td style="color:var(--success); font-weight:700">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</td>`;
                 tableBody.appendChild(tr);
             }
         });
-        document.getElementById('resPoints').innerText = sPts.toLocaleString();
+        document.getElementById('resPoints').innerText = formatNumber(sPts);
         document.getElementById('resTokens').innerText = sTok.toLocaleString(undefined,{maximumFractionDigits:0});
         document.getElementById('resUsd').innerText = '$' + sUsd.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
     }
 
     async function processWallets() {
         const walletText = document.getElementById('walletInput').value;
-        const manualVal = document.getElementById('manualSinglePoints').value;
-        if (manualVal !== "") {
-            walletPointsData = [{ address: "Simulation", points: parseFloat(manualVal) || 0 }];
+        const manualVal = getRawValue('manualSinglePoints');
+        if (manualVal > 0) {
+            walletPointsData = [{ address: "Manual Input", points: manualVal }];
             document.getElementById('tableContainer').style.display = 'none';
             refreshCalculations();
         } else if (walletText !== "") {
