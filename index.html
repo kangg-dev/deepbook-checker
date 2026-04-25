@@ -7,17 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --db-cyan: #00F1FF;
-            --db-navy: #0B1217;
-            --db-card: #141C24;
-            --db-border: #232D38;
-            --text-main: #FFFFFF;
-            --text-dim: #8A98A5;
+            --db-bg: #02080a;
+            --db-card: #0b1217;
+            --db-cyan: #00f1ff;
+            --db-cyan-dim: rgba(0, 241, 255, 0.1);
+            --db-border: #1a242d;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
         }
 
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: var(--db-navy);
+            background-color: var(--db-bg);
             color: var(--text-main);
             margin: 0;
             padding: 20px;
@@ -36,57 +37,72 @@
             align-items: center;
             background: var(--db-card);
             border: 1px solid var(--db-border);
-            padding: 15px 30px;
-            border-radius: 16px;
+            padding: 20px 30px;
+            border-radius: 24px;
             margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         .live-stat { display: flex; align-items: center; gap: 12px; }
-        .stat-label { color: var(--text-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { color: var(--db-cyan); font-family: 'JetBrains Mono'; font-weight: 700; font-size: 18px; }
+        .stat-label { color: var(--text-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .stat-value { color: var(--db-cyan); font-family: 'JetBrains Mono'; font-weight: 700; font-size: 20px; text-shadow: 0 0 15px rgba(0,241,255,0.4); }
 
         /* Main Grid Layout */
         .main-grid {
             display: grid;
-            grid-template-columns: 320px 1fr 320px;
-            gap: 20px;
+            grid-template-columns: 340px 1fr 340px;
+            gap: 24px;
             align-items: start;
         }
 
         .card {
             background: var(--db-card);
             border: 1px solid var(--db-border);
-            border-radius: 20px;
-            padding: 24px;
-            height: 100%;
+            border-radius: 24px;
+            padding: 28px;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--db-cyan), transparent);
+            opacity: 0.3;
         }
 
         .card-title {
             font-size: 14px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             color: var(--db-cyan);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* Form Elements */
-        .field { margin-bottom: 20px; }
-        .label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
+        .field { margin-bottom: 24px; }
+        .label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; }
         
         .input-box {
-            background: #0B1217;
+            background: #060b0e;
             border: 1px solid var(--db-border);
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 14px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
-            transition: 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .input-box:focus-within { border-color: var(--db-cyan); box-shadow: 0 0 10px rgba(0,241,255,0.1); }
+        .input-box:focus-within { 
+            border-color: var(--db-cyan); 
+            box-shadow: 0 0 20px var(--db-cyan-dim);
+            background: #081115;
+        }
 
         input, select, textarea {
             background: transparent;
@@ -94,48 +110,55 @@
             color: white;
             width: 100%;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
         }
-        input:read-only { color: #556677; cursor: not-allowed; }
+        input:read-only { color: #475569; cursor: not-allowed; }
 
         /* Middle Section Specifics */
-        textarea { resize: none; min-height: 120px; }
+        textarea { resize: none; min-height: 140px; }
         .btn-calc {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: var(--db-cyan);
-            color: var(--db-navy);
+            color: #02080a;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: 0.2s;
+            transition: all 0.3s;
             margin-top: 10px;
+            letter-spacing: 1px;
         }
-        .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,241,255,0.3); }
+        .btn-calc:hover { 
+            background: #4df7ff;
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(0,241,255,0.4); 
+        }
 
         /* Right Section Stats */
         .res-item {
-            background: #0B1217;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--db-cyan);
+            background: rgba(255,255,255,0.02);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--db-border);
+            transition: 0.3s;
         }
-        .res-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; }
-        .res-val { font-size: 22px; font-weight: 700; font-family: 'JetBrains Mono'; }
+        .res-item:hover { border-color: var(--db-cyan-dim); background: rgba(255,255,255,0.04); }
+        .res-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        .res-val { font-size: 26px; font-weight: 700; font-family: 'JetBrains Mono'; }
 
         /* Table */
-        .table-container { margin-top: 20px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: var(--text-dim); padding: 12px; border-bottom: 1px solid var(--db-border); }
-        td { padding: 12px; border-bottom: 1px solid var(--db-border); font-family: 'JetBrains Mono'; }
+        .table-container { margin-top: 25px; border-radius: 16px; overflow: hidden; border: 1px solid var(--db-border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; background: #060b0e; }
+        th { text-align: left; color: var(--text-dim); padding: 16px; background: rgba(255,255,255,0.03); font-weight: 600; }
+        td { padding: 16px; border-bottom: 1px solid var(--db-border); font-family: 'JetBrains Mono'; }
 
-        .btn-mini { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 4px; }
-        .btn-mini:hover { color: var(--db-cyan); }
+        .btn-mini { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; }
+        .btn-mini:hover { color: var(--db-cyan); background: var(--db-cyan-dim); }
         .spin { animation: rotate 1s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
@@ -145,44 +168,43 @@
 <div class="container">
     <div class="top-bar">
         <div class="live-stat">
-            <span class="stat-label">DEEP Price (USD):</span>
-            <span class="stat-value" id="topPrice">$0.0000</span>
+            <span class="stat-label">DEEP Price</span>
+            <span class="stat-value" id="topPrice">$0.000000</span>
         </div>
         <div class="live-stat">
-            <span class="stat-label">Current Rate:</span>
+            <span class="stat-label">Market Rate</span>
             <span class="stat-value" id="topRate">1 Pt = 0.00 DEEP</span>
         </div>
         <div class="live-stat">
-            <span class="stat-label" id="priceTime">Auto-refresh active</span>
+            <span class="stat-label" id="priceTime" style="font-size: 11px;">Real-time Indexer</span>
         </div>
     </div>
 
     <div class="main-grid">
         <div class="card">
-            <div class="card-title">⚙️ Project Params</div>
-            
+            <div class="card-title">⚙️ Configuration</div>
             <div class="field">
-                <label class="label">Quick Select % Supply</label>
+                <label class="label">Supply Tier</label>
                 <div class="input-box">
                     <select id="percentSelect" onchange="applyQuickPercent()">
-                        <option value="0.1">0.1% Supply</option>
-                        <option value="0.5">0.5% Supply</option>
-                        <option value="1.0">1.0% Supply</option>
-                        <option value="2.0" selected>2.0% Supply</option>
-                        <option value="3.0">3.0% Supply</option>
+                        <option value="0.1">0.1% Allocation</option>
+                        <option value="0.5">0.5% Allocation</option>
+                        <option value="1.0">1.0% Allocation</option>
+                        <option value="2.0" selected>2.0% Allocation</option>
+                        <option value="3.0">3.0% Allocation</option>
                     </select>
                 </div>
             </div>
 
             <div class="field">
-                <label class="label">% Supply Airdrop (10B)</label>
+                <label class="label">% Airdrop Supply</label>
                 <div class="input-box">
                     <input type="number" id="supplyPercent" value="2.0" step="0.1" oninput="calculateFromSupply()">
                 </div>
             </div>
 
             <div class="field">
-                <label class="label">Total System Points (12M)</label>
+                <label class="label">Est. Global Points</label>
                 <div class="input-box">
                     <input type="number" id="systemTotalPoints" value="12000000" readonly oninput="calculateFromSupply()">
                     <button class="btn-mini" onclick="toggleUnlock()" id="unlockBtn">🔓</button>
@@ -190,14 +212,14 @@
             </div>
 
             <div class="field">
-                <label class="label">Deep Per Point</label>
+                <label class="label">Tokens per Point</label>
                 <div class="input-box">
                     <input type="number" id="deepPerPoint" step="any" oninput="calculateFromRate()">
                 </div>
             </div>
 
             <div class="field">
-                <label class="label">Price Source: DexScreener</label>
+                <label class="label">Manual Price Override</label>
                 <div class="input-box">
                     <input type="number" id="priceInput" step="any" oninput="refreshCalculations()">
                     <button class="btn-mini" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
@@ -206,54 +228,45 @@
         </div>
 
         <div class="card">
-            <div class="card-title">🚀 Airdrop Simulator</div>
-            
+            <div class="card-title">🚀 Simulation</div>
             <div class="field">
-                <label class="label">Paste Wallet List (New line or comma)</label>
+                <label class="label">Sui Wallet Addresses</label>
                 <div class="input-box">
-                    <textarea id="walletInput" placeholder="0x..."></textarea>
+                    <textarea id="walletInput" placeholder="Enter addresses (one per line)..." oninput="clearManualInput()"></textarea>
                 </div>
             </div>
-
-            <div style="text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 15px;">— OR —</div>
-
+            <div style="text-align: center; color: var(--db-border); font-size: 10px; margin-bottom: 20px; font-weight: 800;">OR</div>
             <div class="field">
-                <label class="label">Manual Single Point Input</label>
+                <label class="label">Personal Point Score</label>
                 <div class="input-box">
-                    <input type="number" id="manualSinglePoints" placeholder="Enter points (e.g. 1000)" oninput="handleManualInput()">
+                    <input type="number" id="manualSinglePoints" placeholder="e.g. 50000" oninput="clearWalletInput()">
                 </div>
             </div>
-
-            <button class="btn-calc" onclick="processWallets()">Calculate Rewards</button>
-
+            <button class="btn-calc" onclick="processWallets()">Run Calculation</button>
             <div class="table-container" id="tableContainer" style="display:none;">
                 <table id="walletTable">
-                    <thead><tr><th>Wallet</th><th>Points</th><th>$DEEP</th><th>USD</th></tr></thead>
+                    <thead><tr><th>Wallet</th><th>Points</th><th>$DEEP</th><th>Value</th></tr></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">📊 Your Rewards</div>
-            
+            <div class="card-title">📊 Calculated Rewards</div>
             <div class="res-item">
-                <div class="res-label">Total Points</div>
+                <div class="res-label">Aggregated Points</div>
                 <div class="res-val" id="resPoints">0</div>
             </div>
-
             <div class="res-item">
-                <div class="res-label">Total $DEEP</div>
+                <div class="res-label">Estimated $DEEP</div>
                 <div class="res-val" id="resTokens" style="color: var(--db-cyan);">0</div>
             </div>
-
-            <div class="res-item" style="border-left-color: #02c076;">
-                <div class="res-label">Est. Value (USD)</div>
-                <div class="res-val" id="resUsd" style="color: #02c076;">$0.00</div>
+            <div class="res-item">
+                <div class="res-label">Market Value (USD)</div>
+                <div class="res-val" id="resUsd" style="color: #22c55e;">$0.00</div>
             </div>
-
-            <div style="font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 20px; line-height: 1.5;">
-                *Calculation based on 10B Max Supply. Points fetched directly from Sui Mainnet DeepBook Indexer.
+            <div style="font-size: 11px; color: var(--text-dim); line-height: 1.6; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed var(--db-border);">
+                This tool uses the <strong>DeepBook V3 Indexer</strong>. All results are estimations based on a total supply of 10,000,000,000 $DEEP.
             </div>
         </div>
     </div>
@@ -263,6 +276,9 @@
     const DEEP_TOKEN_ADDR = '0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP';
     const TOTAL_SUPPLY = 10000000000;
     let walletPointsData = [];
+
+    function clearManualInput() { document.getElementById('manualSinglePoints').value = ""; }
+    function clearWalletInput() { document.getElementById('walletInput').value = ""; }
 
     function applyQuickPercent() {
         document.getElementById('supplyPercent').value = document.getElementById('percentSelect').value;
@@ -288,8 +304,7 @@
     }
 
     function updateRateDisplay(rate) {
-        const txt = `1 Pt = ${rate.toLocaleString(undefined, {maximumFractionDigits: 4})} DEEP`;
-        document.getElementById('topRate').innerText = txt;
+        document.getElementById('topRate').innerText = `1 Pt = ${rate.toLocaleString(undefined, {maximumFractionDigits: 4})} DEEP`;
     }
 
     function toggleUnlock() {
@@ -308,7 +323,7 @@
                 const price = parseFloat(data.pairs[0].priceUsd);
                 document.getElementById('priceInput').value = price.toFixed(6);
                 document.getElementById('topPrice').innerText = `$${price.toFixed(6)}`;
-                document.getElementById('priceTime').innerText = `Sync: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('priceTime').innerText = `Updated: ${new Date().toLocaleTimeString()}`;
                 refreshCalculations();
             }
         } catch (e) { console.error(e); }
@@ -329,7 +344,7 @@
             sPts += item.points; sTok += tok; sUsd += usd;
             if (isTable) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${item.address.slice(0,6)}...${item.address.slice(-4)}</td><td>${item.points.toLocaleString()}</td><td style="color:var(--db-cyan)">${tok.toLocaleString(undefined,{maximumFractionDigits:1})}</td><td style="color:#02c076">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</td>`;
+                tr.innerHTML = `<td>${item.address.slice(0,6)}...${item.address.slice(-4)}</td><td>${item.points.toLocaleString()}</td><td style="color:var(--db-cyan)">${tok.toLocaleString(undefined,{maximumFractionDigits:1})}</td><td style="color:#22c55e">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</td>`;
                 tableBody.appendChild(tr);
             }
         });
@@ -338,36 +353,29 @@
         document.getElementById('resUsd').innerText = '$' + sUsd.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
     }
 
-    function handleManualInput() {
-        const val = document.getElementById('manualSinglePoints').value;
-        if (val > 0) {
-            document.getElementById('walletInput').value = '';
-            walletPointsData = [{ address: "Simulation Mode", points: parseFloat(val) }];
+    async function processWallets() {
+        const walletText = document.getElementById('walletInput').value;
+        const manualVal = document.getElementById('manualSinglePoints').value;
+        if (manualVal !== "") {
+            walletPointsData = [{ address: "Simulation Mode", points: parseFloat(manualVal) || 0 }];
             document.getElementById('tableContainer').style.display = 'none';
             refreshCalculations();
-        }
-    }
-
-    async function processWallets() {
-        const input = document.getElementById('walletInput').value;
-        if (!input && !document.getElementById('manualSinglePoints').value) return;
-        if (document.getElementById('manualSinglePoints').value) { handleManualInput(); return; }
-
-        let addrs = [...new Set(input.split(/[\s,]+/).filter(a => a))];
-        document.getElementById('tableContainer').style.display = 'block';
-        walletPointsData = addrs.map(a => ({ address: a, points: 0 }));
-
-        for (let i = 0; i < addrs.length; i += 20) {
-            const chunk = addrs.slice(i, i + 20);
-            try {
-                const res = await fetch(`https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${chunk.join(',')}`);
-                const data = await res.json();
-                data.forEach(d => {
-                    const found = walletPointsData.find(w => w.address.toLowerCase() === d.address.toLowerCase());
-                    if (found) found.points = d.total_points || 0;
-                });
-                refreshCalculations();
-            } catch (e) { console.error(e); }
+        } else if (walletText !== "") {
+            let addrs = [...new Set(walletText.split(/[\s,]+/).filter(a => a))];
+            document.getElementById('tableContainer').style.display = 'block';
+            walletPointsData = addrs.map(a => ({ address: a, points: 0 }));
+            for (let i = 0; i < addrs.length; i += 20) {
+                const chunk = addrs.slice(i, i + 20);
+                try {
+                    const res = await fetch(`https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${chunk.join(',')}`);
+                    const data = await res.json();
+                    data.forEach(d => {
+                        const found = walletPointsData.find(w => w.address.toLowerCase() === d.address.toLowerCase());
+                        if (found) found.points = d.total_points || 0;
+                    });
+                    refreshCalculations();
+                } catch (e) { console.error(e); }
+            }
         }
     }
 
