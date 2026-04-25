@@ -24,98 +24,68 @@
             width: 100%;
             max-width: 950px;
         }
-        h2 { 
-            margin-top: 0; 
-            color: #3bc9db; 
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .price-status {
-            font-size: 12px;
-            text-align: right;
-            color: #adb5bd;
+        h2 { margin-top: 0; color: #3bc9db; text-align: center; margin-bottom: 25px; }
+        
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-bottom: 10px;
-            font-style: italic;
         }
-        .input-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .input-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .input-group label {
-            font-size: 13px;
-            color: #adb5bd;
-            margin-bottom: 5px;
-        }
+        .price-status { font-size: 12px; color: #adb5bd; font-style: italic; }
+        
+        .input-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .input-group { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .input-group label { font-size: 13px; color: #adb5bd; margin-bottom: 5px; }
+        
         input, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background-color: #2b2b36;
-            color: #fff;
-            box-sizing: border-box;
-            font-family: monospace;
-            font-size: 14px;
-            outline: none;
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444;
+            background-color: #2b2b36; color: #fff; box-sizing: border-box;
+            font-family: monospace; font-size: 14px; outline: none;
         }
         input:focus, textarea:focus { border-color: #3bc9db; }
+        
+        /* Nút refresh nhỏ bên trong ô input giá */
+        .refresh-btn-inline {
+            position: absolute;
+            right: 8px;
+            bottom: 6px;
+            background: #3a3a45;
+            border: none;
+            color: #3bc9db;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .refresh-btn-inline:hover { background: #4dabf7; color: #fff; }
+        .refresh-btn-inline:disabled { opacity: 0.5; cursor: not-allowed; }
+
         textarea { resize: vertical; margin-bottom: 15px; }
         
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #3bc9db;
-            color: #121212;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 20px;
+        .btn-main {
+            width: 100%; padding: 15px; background-color: #3bc9db; color: #121212;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 20px;
         }
-        button:hover { background-color: #22b8cf; }
+        .btn-main:hover { background-color: #22b8cf; }
         
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background-color: #2b2b36;
-            border-radius: 8px;
-            overflow: hidden;
-            font-size: 14px;
+            width: 100%; border-collapse: collapse; margin-top: 10px;
+            background-color: #2b2b36; border-radius: 8px; overflow: hidden; font-size: 14px;
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #3a3a45;
-        }
-        th {
-            background-color: #3bc9db;
-            color: #121212;
-            font-weight: bold;
-        }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a45; }
+        th { background-color: #3bc9db; color: #121212; font-weight: bold; }
         .loading { color: #fcc419; }
-        .error { color: #ff6b6b; }
         .success { color: #51cf66; font-weight: bold; }
         .token-col { color: #fcc419; font-weight: bold; }
         .usd-col { color: #ff922b; font-weight: bold; }
         
         .summary-box {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: rgba(59, 201, 219, 0.05);
-            border: 1px dashed #3bc9db;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
+            margin-top: 20px; padding: 20px; background-color: rgba(59, 201, 219, 0.05);
+            border: 1px dashed #3bc9db; border-radius: 8px; display: flex;
+            justify-content: space-around; text-align: center;
         }
         .sum-item p { margin: 0 0 5px 0; color: #adb5bd; font-size: 14px; }
         .sum-item h3 { margin: 0; font-size: 22px; color: #fff; }
@@ -130,22 +100,24 @@
 <div class="container">
     <h2>Deepbook Airdrop Calculator</h2>
     
-    <div class="price-status" id="priceTimer">Đang khởi tạo giá token...</div>
+    <div class="header-meta">
+        <span></span> <div class="price-status" id="priceTimer">Đang lấy giá...</div>
+    </div>
 
     <div class="input-row">
         <div class="input-group">
-            <label>Tỷ lệ quy đổi (Ví dụ: 1 Point = 1 Token)</label>
-            <input type="number" id="rateInput" step="any" value="1">
+            <label>Tỷ lệ quy đổi (1 Point = x Token)</label>
+            <input type="number" id="rateInput" step="any" value="1" oninput="refreshCalculations()">
         </div>
         <div class="input-group">
-            <label>Giá $DEEP (Tự cập nhật từ DexScreener)</label>
-            <input type="number" id="priceInput" step="any" placeholder="Đang lấy giá...">
+            <label>Giá $DEEP (DexScreener)</label>
+            <input type="number" id="priceInput" step="any" placeholder="0.000000" oninput="refreshCalculations()">
+            <button class="refresh-btn-inline" id="manualRefreshBtn" onclick="updateTokenPrice(true)">🔄 Làm mới</button>
         </div>
     </div>
 
-    <textarea id="walletInput" rows="5" placeholder="Dán các địa chỉ ví vào đây (ngăn cách bằng dấu phẩy hoặc xuống dòng)..."></textarea>
-    
-    <button onclick="processWallets()">🚀 Kiểm tra & Tính toán</button>
+    <textarea id="walletInput" rows="5" placeholder="Dán danh sách ví (ngăn cách bằng dấu phẩy hoặc xuống dòng)..."></textarea>
+    <button class="btn-main" onclick="processWallets()">🚀 Kiểm tra & Tính toán</button>
     
     <div id="resultArea" style="display: none;">
         <table>
@@ -163,7 +135,7 @@
 
         <div class="summary-box">
             <div class="sum-item">
-                <p>Tổng Ví Hợp Lệ</p>
+                <p>Tổng Ví</p>
                 <h3 id="validCount">0</h3>
             </div>
             <div class="sum-item">
@@ -183,37 +155,48 @@
 </div>
 
 <script>
-    // Address token $DEEP chính xác bạn vừa cung cấp
     const DEEP_TOKEN_ADDR = '0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP';
     let walletPointsData = []; 
 
     function shortenAddress(addr) {
-        if (addr.length < 15) return addr;
-        return addr.slice(0, 6) + '...' + addr.slice(-4);
+        return addr.length > 15 ? addr.slice(0, 6) + '...' + addr.slice(-4) : addr;
     }
 
-    async function updateTokenPrice() {
+    // --- Cập nhật giá từ DexScreener ---
+    async function updateTokenPrice(isManual = false) {
         const priceInput = document.getElementById('priceInput');
         const priceTimer = document.getElementById('priceTimer');
+        const refreshBtn = document.getElementById('manualRefreshBtn');
+        
+        if (isManual) {
+            refreshBtn.innerText = "⌛...";
+            refreshBtn.disabled = true;
+        }
+
         try {
-            // Encode address để đảm bảo các ký tự "::" không gây lỗi URL
             const encodedAddr = encodeURIComponent(DEEP_TOKEN_ADDR);
             const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodedAddr}`);
             const data = await res.json();
             
             if (data.pairs && data.pairs.length > 0) {
-                // DexScreener trả về danh sách các cặp giao dịch, chúng ta lấy cặp đầu tiên (thường là pool thanh khoản lớn nhất)
-                const price = parseFloat(data.pairs[0].priceUsd);
-                priceInput.value = price.toFixed(6);
-                priceTimer.innerText = `Cập nhật giá: $${price} (${new Date().toLocaleTimeString()})`;
+                const bestPair = data.pairs.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+                const price = parseFloat(bestPair.priceUsd);
                 
-                if (walletPointsData.length > 0) {
-                    refreshCalculations();
-                }
+                priceInput.value = price.toFixed(6);
+                priceTimer.innerText = `Giá $DEEP: $${price} (${isManual ? 'Vừa cập nhật' : 'Tự động lúc ' + new Date().toLocaleTimeString()})`;
+                
+                if (walletPointsData.length > 0) refreshCalculations();
             }
         } catch (err) {
-            console.error("Lỗi lấy giá DexScreener:", err);
-            priceTimer.innerText = "Lỗi kết nối API giá!";
+            console.error("DexScreener Error:", err);
+            priceTimer.innerText = "Lỗi cập nhật giá!";
+        } finally {
+            if (isManual) {
+                setTimeout(() => {
+                    refreshBtn.innerText = "🔄 Làm mới";
+                    refreshBtn.disabled = false;
+                }, 500); // Trì hoãn nhẹ để tạo cảm giác phản hồi
+            }
         }
     }
 
@@ -235,7 +218,7 @@
             const tokTd = document.getElementById(`tok-${index}`);
             const usdTd = document.getElementById(`usd-${index}`);
 
-            if (ptsTd) {
+            if (ptsTd && !ptsTd.classList.contains('loading')) {
                 ptsTd.innerText = item.points.toLocaleString();
                 tokTd.innerText = tokens.toLocaleString(undefined, {maximumFractionDigits: 2});
                 usdTd.innerText = usdValue.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
@@ -255,10 +238,7 @@
         let addresses = inputStr.split(/[\s,]+/).map(a => a.trim()).filter(a => a !== '');
         addresses = [...new Set(addresses)];
 
-        if (addresses.length === 0) {
-            alert('Vui lòng nhập địa chỉ ví!');
-            return;
-        }
+        if (addresses.length === 0) return alert('Vui lòng nhập địa chỉ ví!');
 
         tableBody.innerHTML = '';
         resultArea.style.display = 'block';
@@ -269,7 +249,7 @@
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td class="short-addr" title="${addr}">${shortenAddress(addr)}</td>
-                <td id="pts-${index}" class="loading">⏳ Đang tải...</td>
+                <td id="pts-${index}" class="loading">⏳ Đang lấy dữ liệu...</td>
                 <td id="tok-${index}" class="token-col">-</td>
                 <td id="usd-${index}" class="usd-col">-</td>
             `;
@@ -279,10 +259,8 @@
         const chunkSize = 20;
         for (let i = 0; i < addresses.length; i += chunkSize) {
             const chunk = addresses.slice(i, i + chunkSize);
-            const query = chunk.join(',');
-
             try {
-                const res = await fetch(`https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${query}`);
+                const res = await fetch(`https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${chunk.join(',')}`);
                 const data = await res.json();
 
                 data.forEach(item => {
@@ -292,19 +270,18 @@
                         document.getElementById(`pts-${idx}`).className = 'success';
                     }
                 });
-                
                 document.getElementById('validCount').innerText = addresses.length;
                 refreshCalculations();
-
             } catch (err) {
-                console.error("Lỗi fetch cụm ví:", err);
+                console.error("DeepBook Error:", err);
             }
         }
     }
 
+    // Logic khởi chạy
     window.onload = () => {
-        updateTokenPrice();
-        setInterval(updateTokenPrice, 60000);
+        updateTokenPrice(); // Chạy ngay khi refresh trang
+        setInterval(updateTokenPrice, 60000); // Tự động lặp lại mỗi 1 phút
     };
 </script>
 
