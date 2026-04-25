@@ -3,310 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepbook Multi-Wallet & Airdrop Calculator</title>
+    <title>Deepbook Airdrop Simulator</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-            margin: 0;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #1e1e24;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 950px;
-        }
-        h2 { margin-top: 0; color: #3bc9db; text-align: center; margin-bottom: 25px; }
+        :root { --primary: #3bc9db; --bg: #121212; --card: #1e1e24; --input: #2b2b36; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: #fff; display: flex; justify-content: center; padding: 40px 20px; margin: 0; min-height: 100vh; box-sizing: border-box; }
+        .container { background-color: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); width: 100%; max-width: 950px; }
+        h2 { margin-top: 0; color: var(--primary); text-align: center; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .header-meta {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 8px;
-        }
-        .price-status { font-size: 12px; color: #adb5bd; font-style: italic; }
+        .price-status { font-size: 12px; color: #adb5bd; text-align: right; margin-bottom: 10px; font-style: italic; }
         
-        .input-row { display: flex; gap: 20px; margin-bottom: 20px; }
-        .input-group { flex: 1; display: flex; flex-direction: column; }
+        .input-row { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .input-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
         .input-group label { font-size: 13px; color: #adb5bd; margin-bottom: 8px; font-weight: 500; }
         
-        /* Input container để chứa nút refresh đẹp hơn */
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        input, textarea { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #444; background-color: var(--input); color: #fff; box-sizing: border-box; font-family: 'Roboto Mono', monospace; font-size: 15px; outline: none; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(59, 201, 219, 0.2); }
 
-        input, textarea {
-            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #444;
-            background-color: #2b2b36; color: #fff; box-sizing: border-box;
-            font-family: 'Roboto Mono', monospace; font-size: 15px; outline: none;
-            transition: border-color 0.2s;
-        }
-        input:focus, textarea:focus { border-color: #3bc9db; }
-        
-        /* Nút Refresh kiểu mới: To hơn, rõ hơn, có hiệu ứng hover */
-        .refresh-btn-new {
-            margin-left: 10px;
-            padding: 0 18px;
-            height: 47px; /* Khớp với chiều cao input */
-            background-color: #343a40;
-            color: #3bc9db;
-            border: 1px solid #495057;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .refresh-btn-new:hover {
-            background-color: #3bc9db;
-            color: #121212;
-            border-color: #3bc9db;
-        }
-        .refresh-btn-new:active { transform: scale(0.95); }
-        .refresh-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
-
+        .refresh-btn { margin-left: 10px; padding: 0 15px; height: 47px; background: #343a40; color: var(--primary); border: 1px solid #495057; border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+        .refresh-btn:hover { background: var(--primary); color: #121212; }
         .spin { animation: rotate 0.8s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        textarea { resize: vertical; margin-bottom: 15px; }
-        
-        .btn-main {
-            width: 100%; padding: 16px; background-color: #3bc9db; color: #121212;
-            border: none; border-radius: 10px; font-weight: bold; font-size: 16px;
-            cursor: pointer; transition: all 0.2s; margin-bottom: 25px;
-        }
-        .btn-main:hover { background-color: #22b8cf; box-shadow: 0 0 15px rgba(59, 201, 219, 0.3); }
-        
-        table {
-            width: 100%; border-collapse: collapse; margin-top: 10px;
-            background-color: #2b2b36; border-radius: 10px; overflow: hidden; font-size: 14px;
-        }
+        .calc-info { margin-bottom: 20px; padding: 12px; background: rgba(59, 201, 219, 0.1); border-radius: 8px; color: var(--primary); font-size: 14px; text-align: center; font-weight: bold; }
+
+        .btn-main { width: 100%; padding: 16px; background-color: var(--primary); color: #121212; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 201, 219, 0.4); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: var(--input); border-radius: 10px; overflow: hidden; }
         th, td { padding: 14px; text-align: left; border-bottom: 1px solid #3a3a45; }
-        th { background-color: #3bc9db; color: #121212; font-weight: bold; }
-        .loading { color: #fcc419; }
-        .success { color: #51cf66; font-weight: bold; }
-        .token-col { color: #fcc419; font-weight: bold; }
-        .usd-col { color: #ff922b; font-weight: bold; }
+        th { background-color: var(--primary); color: #121212; }
         
-        .summary-box {
-            margin-top: 25px; padding: 25px; background-color: rgba(59, 201, 219, 0.05);
-            border: 1px dashed #3bc9db; border-radius: 12px; display: flex;
-            justify-content: space-around; text-align: center;
-        }
-        .sum-item p { margin: 0 0 8px 0; color: #adb5bd; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sum-item h3 { margin: 0; font-size: 24px; color: #fff; }
-        .sum-points { color: #51cf66 !important; }
-        .sum-tokens { color: #fcc419 !important; }
-        .sum-usd { color: #ff922b !important; }
+        .summary-box { margin-top: 25px; padding: 25px; background: linear-gradient(145deg, #23232c, #1e1e24); border: 1px solid #3bc9db; border-radius: 16px; display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 20px; }
+        .sum-item p { margin: 0 0 8px 0; color: #adb5bd; font-size: 12px; text-transform: uppercase; }
+        .sum-item h3 { margin: 0; font-size: 26px; }
+        .color-pts { color: #51cf66; } .color-tok { color: #fcc419; } .color-usd { color: #ff922b; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Deepbook Airdrop Calculator</h2>
+    <h2>Deepbook Airdrop Simulator</h2>
     
-    <div class="header-meta">
-        <div class="price-status" id="priceTimer">Đang lấy giá...</div>
-    </div>
+    <div class="price-status" id="priceTimer">Đang lấy giá từ DexScreener...</div>
 
     <div class="input-row">
-        <div class="input-group" style="flex: 0.8;">
-            <label>Tỷ lệ (1 Point = x Token)</label>
-            <input type="number" id="rateInput" step="any" value="1" oninput="refreshCalculations()">
+        <div class="input-group">
+            <label>% Supply Airdrop (Tổng 10B)</label>
+            <input type="number" id="supplyPercent" value="5" step="0.1" oninput="calculateRate()">
         </div>
         <div class="input-group">
-            <label>Giá $DEEP (DexScreener)</label>
+            <label>Tổng Point hệ thống (Để tính tỷ lệ)</label>
+            <input type="number" id="systemTotalPoints" value="100000000" oninput="calculateRate()">
+        </div>
+        <div class="input-group">
+            <label>Giá $DEEP (USD)</label>
             <div class="input-wrapper">
-                <input type="number" id="priceInput" step="any" placeholder="0.000000" oninput="refreshCalculations()">
-                <button class="refresh-btn-new" id="manualRefreshBtn" onclick="updateTokenPrice(true)">
-                    <span id="refreshIcon">🔄</span> Làm mới
-                </button>
+                <input type="number" id="priceInput" step="any" oninput="refreshCalculations()">
+                <button class="refresh-btn" onclick="updateTokenPrice(true)"><span id="refIcon">🔄</span></button>
             </div>
         </div>
     </div>
 
-    <textarea id="walletInput" rows="5" placeholder="Dán danh sách ví (xuống dòng hoặc dấu phẩy)..."></textarea>
-    <button class="btn-main" onclick="processWallets()">🚀 Kiểm tra & Tính toán</button>
+    <div id="rateDisplay" class="calc-info">Tỷ lệ quy đổi: 1 Point = 0.00 DEEP</div>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 25px 0;">
+
+    <div class="input-row">
+        <div class="input-group">
+            <label>Dán danh sách ví (Nếu muốn check nhiều ví)</label>
+            <textarea id="walletInput" rows="4" placeholder="Ví 1, Ví 2..."></textarea>
+        </div>
+        <div class="input-group" style="flex: 0.5;">
+            <label>Hoặc: Nhập số Point riêng</label>
+            <input type="number" id="manualSinglePoints" placeholder="Ví dụ: 5000" oninput="handleManualInput()">
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="processWallets()">🚀 Chạy tính toán</button>
     
-    <div id="resultArea" style="display: none;">
-        <table>
+    <div id="resultArea" style="display: none; margin-top: 20px;">
+        <table id="walletTable">
             <thead>
-                <tr>
-                    <th width="5%">#</th>
-                    <th width="35%">Địa chỉ Ví</th>
-                    <th width="20%">Điểm (Points)</th>
-                    <th width="20%">Số Token</th>
-                    <th width="20%">Giá trị ($)</th>
-                </tr>
+                <tr><th>#</th><th>Địa chỉ Ví</th><th>Points</th><th>Token</th><th>Giá trị ($)</th></tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
 
         <div class="summary-box">
-            <div class="sum-item">
-                <p>Tổng Ví</p>
-                <h3 id="validCount">0</h3>
-            </div>
-            <div class="sum-item">
-                <p>Tổng Points</p>
-                <h3 id="totalPoints" class="sum-points">0</h3>
-            </div>
-            <div class="sum-item">
-                <p>Tổng Token</p>
-                <h3 id="totalTokens" class="sum-tokens">0</h3>
-            </div>
-            <div class="sum-item">
-                <p>Tổng USD</p>
-                <h3 id="totalUsd" class="sum-usd">$0.00</h3>
-            </div>
+            <div class="sum-item"><p>Tổng Points</p><h3 id="totalPoints" class="color-pts">0</h3></div>
+            <div class="sum-item"><p>Tổng $DEEP</p><h3 id="totalTokens" class="color-tok">0</h3></div>
+            <div class="sum-item"><p>Tổng USD</p><h3 id="totalUsd" class="color-usd">$0.00</h3></div>
         </div>
     </div>
 </div>
 
 <script>
     const DEEP_TOKEN_ADDR = '0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP';
-    let walletPointsData = []; 
+    const TOTAL_SUPPLY = 10000000000;
+    let walletPointsData = [];
+    let currentRate = 0;
 
-    function shortenAddress(addr) {
-        return addr.length > 15 ? addr.slice(0, 6) + '...' + addr.slice(-4) : addr;
+    // 1. Tính toán tỷ lệ quy đổi dựa trên % Supply
+    function calculateRate() {
+        const percent = parseFloat(document.getElementById('supplyPercent').value) || 0;
+        const sysPoints = parseFloat(document.getElementById('systemTotalPoints').value) || 1;
+        
+        const totalAirdropTokens = (percent / 100) * TOTAL_SUPPLY;
+        currentRate = totalAirdropTokens / sysPoints;
+        
+        document.getElementById('rateDisplay').innerText = 
+            `Phân bổ: ${totalAirdropTokens.toLocaleString()} DEEP | Tỷ lệ: 1 Point = ${currentRate.toFixed(4)} DEEP`;
+        
+        refreshCalculations();
     }
 
-    async function updateTokenPrice(isManual = false) {
-        const priceInput = document.getElementById('priceInput');
-        const priceTimer = document.getElementById('priceTimer');
-        const refreshBtn = document.getElementById('manualRefreshBtn');
-        const refreshIcon = document.getElementById('refreshIcon');
-        
-        if (isManual) {
-            refreshBtn.disabled = true;
-            refreshIcon.classList.add('spin');
+    // 2. Xử lý khi người dùng nhập point trực tiếp (không dùng ví)
+    function handleManualInput() {
+        const val = document.getElementById('manualSinglePoints').value;
+        if (val > 0) {
+            document.getElementById('walletInput').value = ''; // Xóa textarea nếu nhập số
+            walletPointsData = [{ address: "Ví của bạn (Nhập tay)", points: parseFloat(val) }];
+            showSummaryOnly();
         }
+    }
+
+    function showSummaryOnly() {
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('walletTable').style.display = 'none';
+        refreshCalculations();
+    }
+
+    // 3. Lấy giá từ DexScreener
+    async function updateTokenPrice(isManual = false) {
+        const icon = document.getElementById('refIcon');
+        if (isManual) icon.classList.add('spin');
 
         try {
-            const encodedAddr = encodeURIComponent(DEEP_TOKEN_ADDR);
-            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodedAddr}`);
+            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(DEEP_TOKEN_ADDR)}`);
             const data = await res.json();
-            
-            if (data.pairs && data.pairs.length > 0) {
-                const bestPair = data.pairs.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
-                
-                // Lấy giá thô (raw price) để đảm bảo tính nhất quán
-                const rawPrice = bestPair.priceUsd;
-                const formattedPrice = parseFloat(rawPrice).toFixed(6);
-                
-                // FIX LỖI: Cả 2 nơi cùng dùng chung một biến formattedPrice
-                priceInput.value = formattedPrice; 
-                priceTimer.innerText = `Giá $DEEP: $${formattedPrice} (${isManual ? 'Vừa cập nhật' : 'Tự động lúc ' + new Date().toLocaleTimeString()})`;
-                
-                if (walletPointsData.length > 0) refreshCalculations();
+            if (data.pairs?.[0]) {
+                const price = parseFloat(data.pairs[0].priceUsd);
+                document.getElementById('priceInput').value = price.toFixed(6);
+                document.getElementById('priceTimer').innerText = `Giá $DEEP: $${price.toFixed(6)} (Cập nhật: ${new Date().toLocaleTimeString()})`;
+                refreshCalculations();
             }
-        } catch (err) {
-            console.error("DexScreener Error:", err);
-            priceTimer.innerText = "Lỗi cập nhật giá!";
-        } finally {
-            if (isManual) {
-                setTimeout(() => {
-                    refreshBtn.disabled = false;
-                    refreshIcon.classList.remove('spin');
-                }, 600);
-            }
-        }
+        } catch (e) { console.error(e); }
+        finally { if (isManual) setTimeout(() => icon.classList.remove('spin'), 600); }
     }
 
+    // 4. Tính toán toàn bộ con số
     function refreshCalculations() {
-        const rate = parseFloat(document.getElementById('rateInput').value) || 0;
         const price = parseFloat(document.getElementById('priceInput').value) || 0;
-        
-        let totalSumPoints = 0, totalSumTokens = 0, totalSumUsd = 0;
+        let sumPts = 0, sumTok = 0, sumUsd = 0;
+
+        const tableBody = document.getElementById('tableBody');
+        const isTableVisible = document.getElementById('walletTable').style.display !== 'none';
+
+        if (isTableVisible) tableBody.innerHTML = '';
 
         walletPointsData.forEach((item, index) => {
-            const tokens = item.points * rate;
-            const usdValue = tokens * price;
+            const tokens = item.points * currentRate;
+            const usd = tokens * price;
+            sumPts += item.points; sumTok += tokens; sumUsd += usd;
 
-            totalSumPoints += item.points;
-            totalSumTokens += tokens;
-            totalSumUsd += usdValue;
-
-            const ptsTd = document.getElementById(`pts-${index}`);
-            const tokTd = document.getElementById(`tok-${index}`);
-            const usdTd = document.getElementById(`usd-${index}`);
-
-            if (ptsTd && !ptsTd.classList.contains('loading')) {
-                ptsTd.innerText = item.points.toLocaleString();
-                tokTd.innerText = tokens.toLocaleString(undefined, {maximumFractionDigits: 2});
-                usdTd.innerText = usdValue.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+            if (isTableVisible) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index+1}</td>
+                    <td>${item.address.length > 20 ? item.address.slice(0,6)+'...'+item.address.slice(-4) : item.address}</td>
+                    <td>${item.points.toLocaleString()}</td>
+                    <td class="color-tok">${tokens.toLocaleString(undefined, {maximumFractionDigits: 1})}</td>
+                    <td class="color-usd">$${usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                `;
+                tableBody.appendChild(tr);
             }
         });
 
-        document.getElementById('totalPoints').innerText = totalSumPoints.toLocaleString();
-        document.getElementById('totalTokens').innerText = totalSumTokens.toLocaleString(undefined, {maximumFractionDigits: 2});
-        document.getElementById('totalUsd').innerText = totalSumUsd.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+        document.getElementById('totalPoints').innerText = sumPts.toLocaleString();
+        document.getElementById('totalTokens').innerText = sumTok.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('totalUsd').innerText = '$' + sumUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
+    // 5. Xử lý danh sách ví (Fetch Deepbook API)
     async function processWallets() {
-        const inputStr = document.getElementById('walletInput').value;
-        const tableBody = document.getElementById('tableBody');
-        const resultArea = document.getElementById('resultArea');
+        const input = document.getElementById('walletInput').value;
+        const manualVal = document.getElementById('manualSinglePoints').value;
 
-        let addresses = inputStr.split(/[\s,]+/).map(a => a.trim()).filter(a => a !== '');
-        addresses = [...new Set(addresses)];
+        if (!input && !manualVal) return alert("Vui lòng nhập ví hoặc số point!");
 
-        if (addresses.length === 0) return alert('Vui lòng nhập địa chỉ ví!');
+        if (manualVal) {
+            handleManualInput();
+            return;
+        }
 
-        tableBody.innerHTML = '';
-        resultArea.style.display = 'block';
-        walletPointsData = addresses.map(addr => ({ address: addr, points: 0 }));
+        let addrs = [...new Set(input.split(/[\s,]+/).filter(a => a))];
+        document.getElementById('walletTable').style.display = 'table';
+        document.getElementById('resultArea').style.display = 'block';
+        
+        walletPointsData = addrs.map(a => ({ address: a, points: 0 }));
+        refreshCalculations();
 
-        addresses.forEach((addr, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td class="short-addr" title="${addr}">${shortenAddress(addr)}</td>
-                <td id="pts-${index}" class="loading">⏳ Loading...</td>
-                <td id="tok-${index}" class="token-col">-</td>
-                <td id="usd-${index}" class="usd-col">-</td>
-            `;
-            tableBody.appendChild(tr);
-        });
-
-        const chunkSize = 20;
-        for (let i = 0; i < addresses.length; i += chunkSize) {
-            const chunk = addresses.slice(i, i + chunkSize);
+        for (let i = 0; i < addrs.length; i += 20) {
+            const chunk = addrs.slice(i, i + 20);
             try {
                 const res = await fetch(`https://deepbook-indexer.mainnet.mystenlabs.com/get_points?addresses=${chunk.join(',')}`);
                 const data = await res.json();
-
-                data.forEach(item => {
-                    const idx = addresses.findIndex(a => a.toLowerCase() === item.address.toLowerCase());
-                    if (idx !== -1) {
-                        walletPointsData[idx].points = item.total_points || 0;
-                        document.getElementById(`pts-${idx}`).className = 'success';
-                    }
+                data.forEach(d => {
+                    const found = walletPointsData.find(w => w.address.toLowerCase() === d.address.toLowerCase());
+                    if (found) found.points = d.total_points || 0;
                 });
-                document.getElementById('validCount').innerText = addresses.length;
                 refreshCalculations();
-            } catch (err) { console.error(err); }
+            } catch (e) { console.error(e); }
         }
     }
 
-    window.onload = () => {
-        updateTokenPrice();
-        setInterval(updateTokenPrice, 60000);
-    };
+    window.onload = () => { calculateRate(); updateTokenPrice(); setInterval(updateTokenPrice, 60000); };
 </script>
-
 </body>
 </html>
