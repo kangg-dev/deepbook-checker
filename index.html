@@ -143,7 +143,7 @@
         </div>
     </div>
 
-    <textarea id="walletInput" rows="5" placeholder="Dán các địa chỉ ví vào đây..."></textarea>
+    <textarea id="walletInput" rows="5" placeholder="Dán các địa chỉ ví vào đây (ngăn cách bằng dấu phẩy hoặc xuống dòng)..."></textarea>
     
     <button onclick="processWallets()">🚀 Kiểm tra & Tính toán</button>
     
@@ -183,29 +183,30 @@
 </div>
 
 <script>
-    // Address token $DEEP trên mạng Sui
-    const DEEP_TOKEN_ADDR = '0xdeeb61d8361160a3102fab5f70309a3eb3c72522e6ca00b561775878f088161';
-    let walletPointsData = []; // Bộ nhớ đệm lưu point để ko cần fetch lại khi giá đổi
+    // Address token $DEEP chính xác bạn vừa cung cấp
+    const DEEP_TOKEN_ADDR = '0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP';
+    let walletPointsData = []; 
 
     function shortenAddress(addr) {
         if (addr.length < 15) return addr;
         return addr.slice(0, 6) + '...' + addr.slice(-4);
     }
 
-    // --- Lấy giá từ DexScreener ---
     async function updateTokenPrice() {
         const priceInput = document.getElementById('priceInput');
         const priceTimer = document.getElementById('priceTimer');
         try {
-            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${DEEP_TOKEN_ADDR}`);
+            // Encode address để đảm bảo các ký tự "::" không gây lỗi URL
+            const encodedAddr = encodeURIComponent(DEEP_TOKEN_ADDR);
+            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodedAddr}`);
             const data = await res.json();
             
             if (data.pairs && data.pairs.length > 0) {
+                // DexScreener trả về danh sách các cặp giao dịch, chúng ta lấy cặp đầu tiên (thường là pool thanh khoản lớn nhất)
                 const price = parseFloat(data.pairs[0].priceUsd);
                 priceInput.value = price.toFixed(6);
                 priceTimer.innerText = `Cập nhật giá: $${price} (${new Date().toLocaleTimeString()})`;
                 
-                // Nếu bảng đã có dữ liệu, cập nhật lại tiền mà ko load lại ví
                 if (walletPointsData.length > 0) {
                     refreshCalculations();
                 }
@@ -216,7 +217,6 @@
         }
     }
 
-    // --- Tính toán lại số liệu dựa trên giá/tỷ lệ mới ---
     function refreshCalculations() {
         const rate = parseFloat(document.getElementById('rateInput').value) || 0;
         const price = parseFloat(document.getElementById('priceInput').value) || 0;
@@ -231,7 +231,6 @@
             totalSumTokens += tokens;
             totalSumUsd += usdValue;
 
-            // Update UI từng dòng
             const ptsTd = document.getElementById(`pts-${index}`);
             const tokTd = document.getElementById(`tok-${index}`);
             const usdTd = document.getElementById(`usd-${index}`);
@@ -243,13 +242,11 @@
             }
         });
 
-        // Update Summary
         document.getElementById('totalPoints').innerText = totalSumPoints.toLocaleString();
         document.getElementById('totalTokens').innerText = totalSumTokens.toLocaleString(undefined, {maximumFractionDigits: 2});
         document.getElementById('totalUsd').innerText = totalSumUsd.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
     }
 
-    // --- Xử lý Fetch Point từ Deepbook (Chia cụm 20 ví) ---
     async function processWallets() {
         const inputStr = document.getElementById('walletInput').value;
         const tableBody = document.getElementById('tableBody');
@@ -267,7 +264,6 @@
         resultArea.style.display = 'block';
         walletPointsData = addresses.map(addr => ({ address: addr, points: 0 }));
 
-        // Render placeholders
         addresses.forEach((addr, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -280,7 +276,6 @@
             tableBody.appendChild(tr);
         });
 
-        // Fetch theo cụm 20 ví (Batching)
         const chunkSize = 20;
         for (let i = 0; i < addresses.length; i += chunkSize) {
             const chunk = addresses.slice(i, i + chunkSize);
@@ -307,7 +302,6 @@
         }
     }
 
-    // Chạy ngay khi mở web và lặp lại mỗi 1 phút
     window.onload = () => {
         updateTokenPrice();
         setInterval(updateTokenPrice, 60000);
